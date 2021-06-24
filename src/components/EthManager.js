@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Web3 from "web3";
 import Chains from "./ChainIds/Chains";
 import Explorers from "./Explorers";
+import jsonInterface from "./jsonInterface.json";
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 const contractAddress = "0xA7026E17A0679a96136F7F94a17D286eAc31BF8c";
@@ -9,6 +10,7 @@ const contractAddress = "0xA7026E17A0679a96136F7F94a17D286eAc31BF8c";
 class EthManager extends Component {
 
     chains;
+    contract;
 
     constructor(props) {
         super(props);
@@ -24,6 +26,7 @@ class EthManager extends Component {
                 amount: "",
             },
         }
+        this.contract = new web3.eth.Contract(jsonInterface, contractAddress);
     }
 
     setAccount = (account, chainId, balance) => {
@@ -134,14 +137,14 @@ class EthManager extends Component {
     }
 
     wDAppAddressHandle = (event) => {
-        console.log("Address",event.target.value);
+        console.log("Address", event.target.value);
         const state = {...this.state};
         state.walletDApp.address = event.target.value;
         this.setState(state);
     }
 
     wDAppAmountHandle = (event) => {
-        console.log("Amount",event.target.value);
+        console.log("Amount", event.target.value);
         const state = {...this.state};
         state.walletDApp.amount = event.target.value;
         this.setState(state);
@@ -149,29 +152,45 @@ class EthManager extends Component {
 
     sendHandle = () => {
         const {address, amount} = this.state.walletDApp;
-        // TODO
-        // this.send();
+        console.log("sendHandle", address, amount);
+        this.send(address, amount);
     }
 
-    send(){
+    send = (address, amount) => {
 
         // Si Web3 est connecté
-        const {web3Account} = this.state.isConnected;
-        if (web3Account.length > 0) {
+        const {account} = this.state;
+        if (account) {
 
-            // TODO
+            try {
+                // Exécution d'une requete sur le Contract Solidity
+                this.contract.methods.send(address).send({from: account, value: amount}).then((result) => {
 
-            // // Exécution d'une requete sur le Contract Solidity
-            // this.contract.methods.send().call({from: web3Account[0]}).then((result) => {
-            //
-            //     console.log(result);
-            //     this.setAnswerChoicesState([result[0], result[1]]);
-            //
-            // }).catch((error) => {
-            //     console.error(error);
-            // });
+                    console.log(result);
+                    this.resetWalletDAppForm();
+
+                }).catch((error) => {
+                    console.error(error);
+                    this.setErrors(error.message)
+                });
+            } catch (error) {
+                console.error(error.message);
+                this.setErrors(error.message)
+            }
         }
+    }
 
+    setErrors(errors){
+        const state = {...this.state}
+        state.errors = errors;
+        this.setState(state);
+    }
+
+    resetWalletDAppForm = () => {
+        const state = {...this.state};
+        state.walletDApp.address = "";
+        state.walletDApp.amount = "";
+        this.setState(state);
     }
 
     renderWalletDApp() {
@@ -224,7 +243,9 @@ class EthManager extends Component {
                     </div>
 
                     <div className={"text-start"}>
-                        <button className={"btn btn-outline-primary"}>Send</button>
+                        <button className={"btn btn-outline-primary"} onClick={this.sendHandle}>
+                            Send
+                        </button>
                     </div>
                 </div>
             );
@@ -247,7 +268,9 @@ class EthManager extends Component {
                     <div className={"col-6 text-end"}>
                         {this.renderConnexionW3Button()}
                         {this.renderAccount()}
+                        <div className={"alert alert-danger"}>
                         {this.state.errors}
+                        </div>
                     </div>
 
                 </div>
