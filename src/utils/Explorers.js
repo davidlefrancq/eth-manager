@@ -1,10 +1,10 @@
 import React from 'react';
-import Chains from "./ChainIds/Chains";
+import Chains from "../components/Chains/Chains";
 import {BsArrowUpRight, BsClipboard} from "react-icons/all";
 
 const Explorers = (props) => {
 
-    const {chain, account} = props;
+    const {chain, account, shadow} = props;
     const size = 18;
 
     const copyToClipboard = (text) => {
@@ -24,9 +24,13 @@ const Explorers = (props) => {
     }
 
     const renderClipboardButton = () => {
+        let shadowClass = "";
+        if(shadow){
+            shadowClass = "shadow"
+        }
         return (
             <a href={"#"}
-               className={"shadow p-1 rounded-3 h-100"}
+               className={`${shadowClass} p-1 rounded-3 h-100`}
                style={{marginLeft: 5}}
                onClick={(event) => {
                    event.preventDefault();
@@ -40,13 +44,17 @@ const Explorers = (props) => {
     }
 
     const renderExplorer = (explorer, index) => {
+        let shadowClass = "";
+        if(shadow){
+            shadowClass = "shadow"
+        }
         return (
             <div key={index} className={"d-inline h-100"}>
 
                 {renderClipboardButton()}
 
                 <a href={`${explorer.url}/address/${account}`}
-                   className={"shadow p-1 rounded-3 h-100"}
+                   className={`${shadowClass} p-1 rounded-3 h-100`}
                    style={{marginLeft: 5}}
                    target={"_blank"}
                 >
@@ -58,6 +66,10 @@ const Explorers = (props) => {
 
     const renderExplorers = () => {
         let explorers = [];
+        let shadowClass = "";
+        if(shadow){
+            shadowClass = "shadow"
+        }
 
         if (chain) {
             explorers = Chains.getExplorers(chain);
@@ -78,7 +90,7 @@ const Explorers = (props) => {
 
                     <a
                         href={`https://${testnet}.etherscan.io/address/${account}`}
-                        className={"shadow p-1 rounded-3 h-100"}
+                        className={`${shadowClass} p-1 rounded-3 h-100`}
                         style={{marginLeft: 5}}
                         target={"_blank"}
                     >

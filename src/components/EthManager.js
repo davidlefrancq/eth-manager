@@ -1,16 +1,15 @@
 import React, {Component} from 'react';
+import Chains from "./Chains/Chains";
+import Explorers from "../utils/Explorers";
+import WalletDApp from "./WalletDApp/WalletDApp";
 import Web3 from "web3";
-import Chains from "./ChainIds/Chains";
-import Explorers from "./Explorers";
-import jsonInterface from "./jsonInterface.json";
+import WeiConverter from "../utils/WeiConverter";
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
-const contractAddress = "0xA7026E17A0679a96136F7F94a17D286eAc31BF8c";
 
 class EthManager extends Component {
 
     chains;
-    contract;
 
     constructor(props) {
         super(props);
@@ -21,12 +20,7 @@ class EthManager extends Component {
             accounts: null,
             balance: null,
             errors: "",
-            walletDApp: {
-                address: "",
-                amount: "",
-            },
         }
-        this.contract = new web3.eth.Contract(jsonInterface, contractAddress);
     }
 
     setAccount = (account, chainId, balance) => {
@@ -36,6 +30,10 @@ class EthManager extends Component {
         state.chain = Chains.getChain(chainId);
         state.balance = balance;
         this.setState(state);
+    }
+
+    getBalance = (account) => {
+        return web3.eth.getBalance(account);
     }
 
     web3ProcessData = async (data) => {
@@ -66,7 +64,7 @@ class EthManager extends Component {
                 this.web3ProcessData(result);
 
             }).catch((error) => {
-                console.error(error);
+                this.setErrors(error.message);
             });
         } else {
             const state = {...this.state};
@@ -75,20 +73,11 @@ class EthManager extends Component {
         }
     }
 
-    getAccounts = () => {
-        return web3.eth.getAccounts();
-    }
 
-    getBalance = (account) => {
-        return web3.eth.getBalance(account);
-    }
-
-    balanceToEth() {
+    balanceToEth = () => {
         let result = 0;
         if (this.state.w3Connected) {
-            const balanceEth = this.state.balance * Math.pow(10, -18);
-            const balanceEthRounded = Math.floor((balanceEth * 1000000)) / 1000000;
-            result = balanceEthRounded;
+            result = WeiConverter.weiToEth(this.state.balance);
         }
         return result;
     }
@@ -106,9 +95,10 @@ class EthManager extends Component {
     renderAccount() {
         if (this.state.account) {
             return (
-                <div>
-                    <div className={"d-inline shadow p-1 rounded"}>{this.state.account}</div>
-                    <Explorers account={this.state.account} chain={this.state.chain}/>
+                <div className={"p-5 text-center"}>
+                    <h2 className={"mb-4"}>Account</h2>
+                    <div className={"d-inline rounded shadow p-1"}>{this.state.account}</div>
+                    <Explorers account={this.state.account} chain={this.state.chain} shadow />
                 </div>
             );
         }
@@ -136,118 +126,27 @@ class EthManager extends Component {
         }
     }
 
-    wDAppAddressHandle = (event) => {
-        console.log("Address", event.target.value);
-        const state = {...this.state};
-        state.walletDApp.address = event.target.value;
-        this.setState(state);
-    }
 
-    wDAppAmountHandle = (event) => {
-        console.log("Amount", event.target.value);
-        const state = {...this.state};
-        state.walletDApp.amount = event.target.value;
-        this.setState(state);
-    }
-
-    sendHandle = () => {
-        const {address, amount} = this.state.walletDApp;
-        console.log("sendHandle", address, amount);
-        this.send(address, amount);
-    }
-
-    send = (address, amount) => {
-
-        // Si Web3 est connecté
-        const {account} = this.state;
-        if (account) {
-
-            try {
-                // Exécution d'une requete sur le Contract Solidity
-                this.contract.methods.send(address).send({from: account, value: amount}).then((result) => {
-
-                    console.log(result);
-                    this.resetWalletDAppForm();
-
-                }).catch((error) => {
-                    console.error(error);
-                    this.setErrors(error.message)
-                });
-            } catch (error) {
-                console.error(error.message);
-                this.setErrors(error.message)
-            }
-        }
-    }
-
-    setErrors(errors){
+    setErrors(errors) {
         const state = {...this.state}
         state.errors = errors;
         this.setState(state);
     }
 
-    resetWalletDAppForm = () => {
-        const state = {...this.state};
-        state.walletDApp.address = "";
-        state.walletDApp.amount = "";
-        this.setState(state);
+    renderErrors() {
+        if (this.state.errors && this.state.errors != "") {
+            return (
+                <div className={"alert alert-danger"}>
+                    {this.state.errors}
+                </div>
+            );
+        }
     }
 
     renderWalletDApp() {
         if (this.state.w3Connected) {
-            const balance = this.balanceToEth();
             return (
-                <div className={"container"}>
-                    <h2 className={"text-start"}>Wallet dApp</h2>
-
-                    <div className={"row"}>
-                        <div className={"col-4 text-start"}>
-                            Amount Ethers:
-                        </div>
-                        <div className={"col-8 row"}>
-                            <div className={"col-10"}>
-                                <input type={"text"} value={balance} className={"form-control disabled"} disabled/>
-                            </div>
-                            <div className={"col-2 text-start pt-1"}>
-                                ETH
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className={"row"}>
-                        <div className={"col-4 text-start"}>
-                            Address:
-                        </div>
-                        <div className={"col-8 text-start"}>
-                            <input
-                                className={"form-control"}
-                                type={"text"}
-                                value={this.state.walletDApp.address}
-                                onChange={this.wDAppAddressHandle}
-                            />
-                        </div>
-                    </div>
-
-                    <div className={"row"}>
-                        <div className={"col-4 text-start"}>
-                            Amount:
-                        </div>
-                        <div className={"col-8 text-start"}>
-                            <input
-                                className={"form-control"}
-                                type={"number"}
-                                value={this.state.walletDApp.amount}
-                                onChange={this.wDAppAmountHandle}
-                            />
-                        </div>
-                    </div>
-
-                    <div className={"text-start"}>
-                        <button className={"btn btn-outline-primary"} onClick={this.sendHandle}>
-                            Send
-                        </button>
-                    </div>
-                </div>
+                <WalletDApp account={this.state.account} balanceToEth={this.balanceToEth} chain={this.state.chain}/>
             );
         }
     }
@@ -268,9 +167,7 @@ class EthManager extends Component {
                     <div className={"col-6 text-end"}>
                         {this.renderConnexionW3Button()}
                         {this.renderAccount()}
-                        <div className={"alert alert-danger"}>
-                        {this.state.errors}
-                        </div>
+                        {this.renderErrors()}
                     </div>
 
                 </div>
