@@ -1,14 +1,14 @@
 import React, {Component} from 'react';
 import Web3 from "web3";
 import jsonInterface from "./jsonInterface.json";
-import Transactions from "./Transactions";
+import Transactions from "../WalletDApp/Transactions";
 import {CANCELED, SUCCESS, Transaction} from "../bo/Transaction";
+import WeiConverter from "../../utils/WeiConverter";
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
-const contractAddress = "0xA7026E17A0679a96136F7F94a17D286eAc31BF8c";
+const contractAddress = "0x645A0c9957e35213D17f30f8cdE8230C0C9A029A";
 
-
-class WalletDApp extends Component {
+class TokenDAppErc20 extends Component {
 
     contract;
 
@@ -18,6 +18,8 @@ class WalletDApp extends Component {
             address: "",
             amount: "",
             balance: 0,
+            decimals:0,
+            symbol: null,
             transactionInProgress: false,
             errors: "",
             transactions: [],
@@ -25,43 +27,82 @@ class WalletDApp extends Component {
     }
 
     componentDidMount() {
-        this.init()
+        this.init();
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.account != this.props.account) {
-            this.initBalance();
+            this.init();
         }
     }
 
     init() {
         this.contract = new web3.eth.Contract(jsonInterface, contractAddress);
         this.initBalance();
+        this.initSymbol();
+        this.initDecimals();
+    }
+
+    setStateBalance = (balance) => {
+        const state = {...this.state.balance};
+        state.balance = balance;
+        this.setState(state);
     }
 
     initBalance = () => {
+        if (this.contract) {
+            this.contract.methods.balanceOf(this.props.account).call({from: this.props.account}).then((result) => {
+                this.setStateBalance(result);
+            }).catch((error) => {
+                this.setErrors(error.message)
+            });
+        }
+    }
+
+    initDecimals = () => {
+        if (this.contract) {
+            this.contract.methods.decimals().call({from: this.props.account}).then((result) => {
+                this.setStateDecimals(Number.parseInt(result));
+            }).catch((error) => {
+                this.setErrors(error.message)
+            });
+        }
+    }
+
+    initSymbol = () => {
+        if (this.contract) {
+            this.contract.methods.symbol().call({from: this.props.account}).then((result) => {
+                this.setStateSymbol(result);
+            }).catch((error) => {
+                this.setErrors(error.message)
+            });
+        }
+    }
+
+    setStateSymbol = (symbol) => {
         const state = {...this.state};
-        state.balance = this.props.balanceToEth();
+        state.symbol = symbol;
         this.setState(state);
     }
 
-    getAccounts = () => {
-        return web3.eth.getAccounts();
-    }
-
-    getBalance = (account) => {
-        return web3.eth.getBalance(account);
-    }
-
-    addressHandle = (event) => {
+    setStateDecimals = (decimals) => {
         const state = {...this.state};
-        state.address = event.target.value;
+        state.decimals = decimals;
         this.setState(state);
     }
 
-    amountHandle = (event) => {
+    setErrors(errors) {
+        const state = {...this.state}
+        state.errors = errors;
+        this.setState(state);
+    }
+
+    resetForm = () => {
         const state = {...this.state};
-        state.amount = event.target.value;
+        state.address = "";
+        state.amount = "";
+        state.transactionInProgress = false;
+        state.errors = "";
         this.setState(state);
     }
 
@@ -84,13 +125,19 @@ class WalletDApp extends Component {
     sendHandle = () => {
         const stateTmp = {...this.state}
         const to = stateTmp.address;
-        const value = (Number.parseFloat(stateTmp.amount) * Math.pow(10,18));
+        const value = (stateTmp.amount * (10 ** this.state.decimals)).toString();
         this.send(to, value);
 
         const state = {...this.state}
         state.address = "";
         state.amount = "";
         this.setState(state)
+    }
+
+    substractionStateBalance = (amount) => {
+        const state = {...this.state};
+        state.balance -= amount;
+        this.setState(state);
     }
 
     send = (address, amount) => {
@@ -104,8 +151,9 @@ class WalletDApp extends Component {
             const transaction = this.addTransaction(account, address, amount);
             try {
                 // Exécution d'une requete sur le Contract Solidity
-                this.contract.methods.send(address).send({from: account, value: amount}).then((result) => {
+                this.contract.methods.transfer(address, amount).send({from: account}).then((result) => {
                     transaction.status = SUCCESS;
+                    this.substractionStateBalance(amount);
                     this.resetForm();
 
                 }).catch((error) => {
@@ -121,18 +169,15 @@ class WalletDApp extends Component {
         }
     }
 
-    setErrors(errors) {
-        const state = {...this.state}
-        state.errors = errors;
+    addressHandle = (event) => {
+        const state = {...this.state};
+        state.address = event.target.value;
         this.setState(state);
     }
 
-    resetForm = () => {
+    amountHandle = (event) => {
         const state = {...this.state};
-        state.address = "";
-        state.amount = "";
-        state.transactionInProgress = false;
-        state.errors = "";
+        state.amount = event.target.value;
         this.setState(state);
     }
 
@@ -172,7 +217,9 @@ class WalletDApp extends Component {
         const {balance} = this.state;
         return (
             <div className={"container mt-3 p-4 shadow"}>
-                <h2 className={"text-start mb-4"}>Wallet dApp</h2>
+                <h2 className={"text-start mb-4"}>
+                    WCS Token
+                </h2>
 
                 <div className={"container-fluid p-3"} style={{position: "relative"}}>
 
@@ -182,10 +229,11 @@ class WalletDApp extends Component {
                         </div>
                         <div className={"col-8 row"}>
                             <div className={"col-10"}>
-                                <input type={"text"} value={balance} className={"form-control disabled"} disabled/>
+                                <input type={"text"} value={WeiConverter.weiToEth(balance)}
+                                       className={"form-control disabled"} disabled/>
                             </div>
                             <div className={"col-2 text-start pt-1"}>
-                                ETH
+                                {this.state.symbol}
                             </div>
                         </div>
                     </div>
@@ -220,8 +268,9 @@ class WalletDApp extends Component {
                                 />
                             </div>
                             <div className={"col-2 text-start pt-1"}>
-                                ETH
+                                {this.state.symbol}
                             </div>
+
                         </div>
                     </div>
 
@@ -242,7 +291,11 @@ class WalletDApp extends Component {
         if (this.state.transactions && this.state.transactions.length > 0) {
             return (
                 <div className={"transactions-animation"}>
-                    <Transactions transactions={this.state.transactions} chain={this.props.chain}/>
+                    <Transactions
+                        transactions={this.state.transactions}
+                        chain={this.props.chain}
+                        currency={this.state.symbol}
+                    />
                 </div>
             );
         }
@@ -258,4 +311,4 @@ class WalletDApp extends Component {
     }
 }
 
-export default WalletDApp;
+export default TokenDAppErc20;

@@ -29,8 +29,8 @@ const Explorers = (props) => {
             shadowClass = "shadow"
         }
         return (
-            <a href={"#"}
-               className={`${shadowClass} p-1 rounded-3 h-100`}
+            <button
+               className={`btn btn-link ${shadowClass} p-1 rounded-3 h-100`}
                style={{marginLeft: 5}}
                onClick={(event) => {
                    event.preventDefault();
@@ -38,7 +38,7 @@ const Explorers = (props) => {
                }}
             >
                 <BsClipboard/>
-            </a>
+            </button>
 
         );
     }
@@ -54,7 +54,7 @@ const Explorers = (props) => {
                 {renderClipboardButton()}
 
                 <a href={`${explorer.url}/address/${account}`}
-                   className={`${shadowClass} p-1 rounded-3 h-100`}
+                   className={`btn btn-link ${shadowClass} p-1 rounded-3 h-100`}
                    style={{marginLeft: 5}}
                    target={"_blank"}
                 >
@@ -90,7 +90,7 @@ const Explorers = (props) => {
 
                     <a
                         href={`https://${testnet}.etherscan.io/address/${account}`}
-                        className={`${shadowClass} p-1 rounded-3 h-100`}
+                        className={`btn btn-link ${shadowClass} p-1 rounded-3 h-100`}
                         style={{marginLeft: 5}}
                         target={"_blank"}
                     >

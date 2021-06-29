@@ -4,6 +4,8 @@ import Explorers from "../utils/Explorers";
 import WalletDApp from "./WalletDApp/WalletDApp";
 import Web3 from "web3";
 import WeiConverter from "../utils/WeiConverter";
+import AddressFormater from "../utils/AddressFormater";
+import TokenDAppErc20 from "./TokenDApp/TokenDAppERC20";
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
@@ -95,10 +97,14 @@ class EthManager extends Component {
     renderAccount() {
         if (this.state.account) {
             return (
-                <div className={"p-5 text-center"}>
+                <div className={"mt-3 p-4 text-center border-start border-end border-dark "}>
                     <h2 className={"mb-4"}>Account</h2>
-                    <div className={"d-inline rounded shadow p-1"}>{this.state.account}</div>
-                    <Explorers account={this.state.account} chain={this.state.chain} shadow />
+                    <div className={"d-flex justify-content-center"}>
+                        <div className={"d-inline rounded p-1 shadow"}>{AddressFormater.minimizer(this.state.account)}</div>
+                        <div>
+                            <Explorers account={this.state.account} chain={this.state.chain} shadow={"shadow"}/>
+                        </div>
+                    </div>
                 </div>
             );
         }
@@ -119,7 +125,7 @@ class EthManager extends Component {
         const name = Chains.getName(this.state.chain);
         if (name) {
             return (
-                <div className={"d-block text-center"}>
+                <div className={"d-block text-center bg-dark text-white border-top border-white p-1 mb-3"}>
                     <h1>{name}</h1>
                 </div>
             );
@@ -146,7 +152,22 @@ class EthManager extends Component {
     renderWalletDApp() {
         if (this.state.w3Connected) {
             return (
-                <WalletDApp account={this.state.account} balanceToEth={this.balanceToEth} chain={this.state.chain}/>
+                <div className={"mb-5"}>
+                    <WalletDApp account={this.state.account} balanceToEth={this.balanceToEth} chain={this.state.chain}/>
+                </div>
+            );
+        }
+    }
+
+    renderTokenDAppERC10() {
+        if (this.state.w3Connected) {
+            return (
+                <div className={"mb-5"}>
+                    <TokenDAppErc20
+                        account={this.state.account}
+                        chain={this.state.chain}
+                    />
+                </div>
             );
         }
     }
@@ -154,24 +175,32 @@ class EthManager extends Component {
     render() {
 
         return (
-            <div className={"container"}>
+            <div className={"container-fluid m-0 p-0"}>
+
                 {this.renderChainInfo()}
 
+                <div className={"container-fluid"}>
+                    <div className={"row"}>
 
-                <div className={"row"}>
+                        <div className={"col-12 col-xl-2"}>
+                            {this.renderAccount()}
+                        </div>
 
-                    <div className={"col-6"}>
-                        {this.renderWalletDApp()}
+                        <div className={"col-12 col-xl-4"}>
+                            {this.renderWalletDApp()}
+                        </div>
+
+                        <div className={"col-12 col-xl-4"}>
+                            {this.renderTokenDAppERC10()}
+                        </div>
+
+                        <div className={"col-12 col-xl-2 text-end"}>
+                            {this.renderConnexionW3Button()}
+                            {this.renderErrors()}
+                        </div>
+
                     </div>
-
-                    <div className={"col-6 text-end"}>
-                        {this.renderConnexionW3Button()}
-                        {this.renderAccount()}
-                        {this.renderErrors()}
-                    </div>
-
                 </div>
-
             </div>
         );
     }

@@ -50,6 +50,7 @@ class Transactions extends Component {
         const miniFrom = AddressFormater.minimizer(transaction.from);
         const miniTo = AddressFormater.minimizer(transaction.to);
         const eth = WeiConverter.weiToEth(transaction.value);
+        const currency = this.props.currency ? this.props.currency : "ETH"
 
         return (
             <tr key={index}>
@@ -65,7 +66,7 @@ class Transactions extends Component {
                     <Explorers account={transaction.to} chain={this.props.chain}/>
                 </td>
                 <td>
-                    {eth} ETH
+                    {eth} {currency}
                 </td>
             </tr>
         );
