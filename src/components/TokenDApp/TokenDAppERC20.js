@@ -18,11 +18,12 @@ class TokenDAppErc20 extends Component {
             address: "",
             amount: "",
             balance: 0,
-            decimals:0,
+            decimals: 0,
             symbol: null,
             transactionInProgress: false,
             errors: "",
             transactions: [],
+            contractAddress: contractAddress,
         };
     }
 
@@ -36,8 +37,8 @@ class TokenDAppErc20 extends Component {
         }
     }
 
-    init() {
-        this.contract = new web3.eth.Contract(jsonInterface, contractAddress);
+    init = () => {
+        this.contract = new web3.eth.Contract(jsonInterface, this.state.contractAddress);
         this.initBalance();
         this.initSymbol();
         this.initDecimals();
@@ -213,6 +214,13 @@ class TokenDAppErc20 extends Component {
         }
     }
 
+    erc20Handle = (event) => {
+        event.preventDefault();
+        const state = {...this.state};
+        state.contractAddress = event.target.value;
+        this.setState(state);
+    }
+
     renderForm() {
         const {balance} = this.state;
         return (
@@ -222,6 +230,34 @@ class TokenDAppErc20 extends Component {
                 </h2>
 
                 <div className={"container-fluid p-3"} style={{position: "relative"}}>
+
+                    <div className={"row"}>
+                        <div className={"col-4 text-start"}>
+                            Contract ERC20 :
+                        </div>
+                        <div className={"col-8 row"}>
+                            <div className={"col-10"}>
+                                <input
+                                    className={"form-control"}
+                                    type={"text"}
+                                    value={this.state.contractAddress}
+                                    onChange={this.erc20Handle}
+                                />
+                            </div>
+                            <div className={"col-2 text-start"}>
+                                <button className={"btn btn-outline-primary"} onClick={() => {
+                                    const size = contractAddress.length;
+                                    if(this.state.contractAddress.length == size){
+                                        this.init();
+                                    }else{
+                                        console.error("Wrong address",this.state.contractAddress.length,this.state.contractAddress);
+                                    }
+                                }}>
+                                    Connect
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
                     <div className={"row"}>
                         <div className={"col-4 text-start"}>
