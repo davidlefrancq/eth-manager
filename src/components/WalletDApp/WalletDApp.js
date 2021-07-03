@@ -3,6 +3,7 @@ import Web3 from "web3";
 import jsonInterface from "./jsonInterface.json";
 import Transactions from "./Transactions";
 import {CANCELED, SUCCESS, Transaction} from "../bo/Transaction";
+import Error from "../Error";
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 const contractAddress = "0xA7026E17A0679a96136F7F94a17D286eAc31BF8c";
@@ -19,7 +20,7 @@ class WalletDApp extends Component {
             amount: "",
             balance: 0,
             transactionInProgress: false,
-            errors: "",
+            errors: [],
             transactions: [],
         };
     }
@@ -110,20 +111,32 @@ class WalletDApp extends Component {
 
                 }).catch((error) => {
                     transaction.status = CANCELED;
-                    this.setErrors(error.message)
+                    this.addError(error.message)
                     this.setTransactionInProgress(false);
                 });
             } catch (error) {
                 transaction.status = CANCELED;
-                this.setErrors(error.message)
+                this.addError(error.message)
                 this.setTransactionInProgress(false);
             }
         }
     }
 
-    setErrors(errors) {
+    addError = (errors) => {
         const state = {...this.state}
-        state.errors = errors;
+        state.errors.push(errors);
+        this.setState(state);
+    }
+
+    removeError = (index) => {
+        const state = {...this.state}
+        state.errors.splice(index,1);
+        this.setState(state);
+    }
+
+    resetErrors = () => {
+        const state = {...this.state}
+        state.errors = [];
         this.setState(state);
     }
 
@@ -132,39 +145,14 @@ class WalletDApp extends Component {
         state.address = "";
         state.amount = "";
         state.transactionInProgress = false;
-        state.errors = "";
         this.setState(state);
     }
 
     renderErrors() {
-        if (this.state.errors && this.state.errors != "") {
-            return (
-                <div className={"alert alert-danger h-100 w-100 text-center rounded shadow"}
-                     style={{
-                         position: "absolute",
-                         top: 0,
-                         left: 0,
-                         backgroundColor: "rgb(255,255,255,0.95)",
-                         zIndex: "999"
-                     }}
-                >
-                    <div style={{position: "relative p-5"}}>
-                        <div className={"fw-bold mt-5"} style={{fontSize: 20}}>
-                            {this.state.errors}
-                        </div>
-
-                        <button
-                            className={"btn btn-danger m-3"}
-                            onClick={() => {
-                                this.setErrors("")
-                            }}
-                        >
-                            Close
-                        </button>
-                    </div>
-
-                </div>
-            );
+        if (this.state.errors && this.state.errors.length > 0) {
+            return this.state.errors.map((error, index) => {
+                return <Error key={index} id={index} error={error} removeError={this.removeError}/>;
+            });
         }
     }
 

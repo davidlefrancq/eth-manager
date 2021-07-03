@@ -4,6 +4,7 @@ import jsonInterface from "./jsonInterface.json";
 import Transactions from "../WalletDApp/Transactions";
 import {CANCELED, SUCCESS, Transaction} from "../bo/Transaction";
 import WeiConverter from "../../utils/WeiConverter";
+import Error from "../Error";
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 const contractAddress = "0x645A0c9957e35213D17f30f8cdE8230C0C9A029A";
@@ -21,7 +22,7 @@ class TokenDAppErc20 extends Component {
             decimals: 0,
             symbol: null,
             transactionInProgress: false,
-            errors: "",
+            errors: [],
             transactions: [],
             contractAddress: contractAddress,
         };
@@ -55,7 +56,7 @@ class TokenDAppErc20 extends Component {
             this.contract.methods.balanceOf(this.props.account).call({from: this.props.account}).then((result) => {
                 this.setStateBalance(result);
             }).catch((error) => {
-                this.setErrors(error.message)
+                this.addError(error.message)
             });
         }
     }
@@ -65,7 +66,7 @@ class TokenDAppErc20 extends Component {
             this.contract.methods.decimals().call({from: this.props.account}).then((result) => {
                 this.setStateDecimals(Number.parseInt(result));
             }).catch((error) => {
-                this.setErrors(error.message)
+                this.addError(error.message)
             });
         }
     }
@@ -75,7 +76,7 @@ class TokenDAppErc20 extends Component {
             this.contract.methods.symbol().call({from: this.props.account}).then((result) => {
                 this.setStateSymbol(result);
             }).catch((error) => {
-                this.setErrors(error.message)
+                this.addError(error.message)
             });
         }
     }
@@ -92,9 +93,21 @@ class TokenDAppErc20 extends Component {
         this.setState(state);
     }
 
-    setErrors(errors) {
+    addError = (error) => {
         const state = {...this.state}
-        state.errors = errors;
+        state.errors.push(error);
+        this.setState(state);
+    }
+
+    removeError = (index) => {
+        const state = {...this.state}
+        state.errors.splice(index,1);
+        this.setState(state);
+    }
+
+    resetErrors = () => {
+        const state = {...this.state}
+        state.errors = [];
         this.setState(state);
     }
 
@@ -103,7 +116,6 @@ class TokenDAppErc20 extends Component {
         state.address = "";
         state.amount = "";
         state.transactionInProgress = false;
-        state.errors = "";
         this.setState(state);
     }
 
@@ -159,12 +171,12 @@ class TokenDAppErc20 extends Component {
 
                 }).catch((error) => {
                     transaction.status = CANCELED;
-                    this.setErrors(error.message)
+                    this.addError(error.message)
                     this.setTransactionInProgress(false);
                 });
             } catch (error) {
                 transaction.status = CANCELED;
-                this.setErrors(error.message)
+                this.addError(error.message)
                 this.setTransactionInProgress(false);
             }
         }
@@ -183,34 +195,10 @@ class TokenDAppErc20 extends Component {
     }
 
     renderErrors() {
-        if (this.state.errors && this.state.errors != "") {
-            return (
-                <div className={"alert alert-danger h-100 w-100 text-center rounded shadow"}
-                     style={{
-                         position: "absolute",
-                         top: 0,
-                         left: 0,
-                         backgroundColor: "rgb(255,255,255,0.95)",
-                         zIndex: "999"
-                     }}
-                >
-                    <div style={{position: "relative p-5"}}>
-                        <div className={"fw-bold mt-5"} style={{fontSize: 20}}>
-                            {this.state.errors}
-                        </div>
-
-                        <button
-                            className={"btn btn-danger m-3"}
-                            onClick={() => {
-                                this.setErrors("")
-                            }}
-                        >
-                            Close
-                        </button>
-                    </div>
-
-                </div>
-            );
+        if (this.state.errors && this.state.errors.length > 0) {
+            return this.state.errors.map((error, index) => {
+                return <Error key={index} id={index} error={error} removeError={this.removeError}/>;
+            });
         }
     }
 
@@ -247,10 +235,11 @@ class TokenDAppErc20 extends Component {
                             <div className={"col-2 text-start"}>
                                 <button className={"btn btn-outline-primary"} onClick={() => {
                                     const size = contractAddress.length;
-                                    if(this.state.contractAddress.length == size){
+                                    if (this.state.contractAddress.length == size) {
                                         this.init();
-                                    }else{
-                                        console.error("Wrong address",this.state.contractAddress.length,this.state.contractAddress);
+                                    } else {
+                                        this.addError("Wrong address !")
+                                        console.error("Wrong address", this.state.contractAddress.length, this.state.contractAddress);
                                     }
                                 }}>
                                     Connect
