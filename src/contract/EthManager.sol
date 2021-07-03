@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract EthManager {
+import "./ERC20.sol";
 
-    function send(address _receiver) payable {
-        _receiver.send(msg.value);
+contract WCVToken is ERC20{
+
+    constructor(uint256 initialSupply) ERC20("EduToken","WCS") {
+        _mint(msg.sender, initialSupply);
     }
+
 }
