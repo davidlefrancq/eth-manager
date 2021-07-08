@@ -5,11 +5,7 @@ import {SUCCESS, IN_PROGRESS, CANCELED} from "../bo/Transaction";
 import Explorers from "../../utils/Explorers";
 
 class Transactions extends Component {
-
-    constructor(props, context) {
-        super(props, context);
-    }
-
+    
     renderSnipper(){
         return(
             <div className="spinner-grow text-primary" role="status" style={{maxWidth:25, maxHeight:25}}>

@@ -57,7 +57,7 @@ const Explorers = (props) => {
                    className={`btn btn-link ${shadowClass} p-1 rounded-3 h-100`}
                    style={{marginLeft: 5}}
                    target={"_blank"}
-                   rel={`${explorer.name}`}
+                   rel={`noreferrer`}
                 >
                     <BsArrowUpRight size={size}/>
                 </a>
@@ -95,7 +95,7 @@ const Explorers = (props) => {
                         className={`btn btn-link ${shadowClass} p-1 rounded-3 h-100`}
                         style={{marginLeft: 5}}
                         target={"_blank"}
-                        rel={`${testnet}`}
+                        rel={`noreferrer`}
                     >
                         <BsArrowUpRight size={size}/>
                     </a>
