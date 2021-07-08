@@ -24,25 +24,33 @@ class TokenDAppErc20 extends Component {
             transactionInProgress: false,
             errors: [],
             transactions: [],
-            contractAddress: contractAddress,
+            contractAddress: "",
+            addressErc20ClassCss: "is-invalid",
         };
     }
 
-    componentDidMount() {
-        this.init();
+    setErc20Valid = () => {
+        const state = {...this.state};
+        state.addressErc20ClassCss = "is-valid"
+        this.setState(state);
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.account !== this.props.account) {
-            this.init();
+    setErc20Invalid = () => {
+        const state = {...this.state};
+        state.addressErc20ClassCss = "is-invalid"
+        this.setState(state);
+    }
+
+    initContract = () => {
+        try {
+            this.contract = new web3.eth.Contract(jsonInterface, this.state.contractAddress);
+            this.initBalance();
+            this.initSymbol();
+            this.initDecimals();
+            this.setErc20Valid();
+        } catch (error) {
+            this.setErc20Invalid();
         }
-    }
-
-    init = () => {
-        this.contract = new web3.eth.Contract(jsonInterface, this.state.contractAddress);
-        this.initBalance();
-        this.initSymbol();
-        this.initDecimals();
     }
 
     setStateBalance = (balance) => {
@@ -101,7 +109,7 @@ class TokenDAppErc20 extends Component {
 
     removeError = (index) => {
         const state = {...this.state}
-        state.errors.splice(index,1);
+        state.errors.splice(index, 1);
         this.setState(state);
     }
 
@@ -202,11 +210,27 @@ class TokenDAppErc20 extends Component {
         }
     }
 
+    setContractAddress = (event) => {
+        return new Promise((resolve, reject) => {
+            try {
+                const state = {...this.state};
+                state.contractAddress = event.target.value;
+                this.setState(state);
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+
+        });
+    }
+
     erc20Handle = (event) => {
         event.preventDefault();
-        const state = {...this.state};
-        state.contractAddress = event.target.value;
-        this.setState(state);
+        this.setContractAddress(event).then(()=>{
+            this.initContract();
+        }).catch((error)=>{
+            this.addError(error.message);
+        })
     }
 
     renderForm() {
@@ -226,24 +250,13 @@ class TokenDAppErc20 extends Component {
                         <div className={"col-8 row"}>
                             <div className={"col-10"}>
                                 <input
-                                    className={"form-control"}
+                                    className={`form-control ${this.state.addressErc20ClassCss}`}
                                     type={"text"}
                                     value={this.state.contractAddress}
                                     onChange={this.erc20Handle}
                                 />
                             </div>
                             <div className={"col-2 text-start"}>
-                                <button className={"btn btn-outline-primary"} onClick={() => {
-                                    const size = contractAddress.length;
-                                    if (this.state.contractAddress.length === size) {
-                                        this.init();
-                                    } else {
-                                        this.addError("Wrong address !")
-                                        console.error("Wrong address", this.state.contractAddress.length, this.state.contractAddress);
-                                    }
-                                }}>
-                                    Connect
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -299,9 +312,9 @@ class TokenDAppErc20 extends Component {
                         </div>
                     </div>
 
-                    <div className={"text-start"}>
-                        <button className={"btn btn-outline-primary"} onClick={this.sendHandle}>
-                            Send
+                    <div className={"text-end"}>
+                        <button className={"btn btn-primary"} onClick={this.sendHandle}>
+                            Submit
                         </button>
                     </div>
 
