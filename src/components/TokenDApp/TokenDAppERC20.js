@@ -7,7 +7,7 @@ import WeiConverter from "../../utils/WeiConverter";
 import Error from "../Error";
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
-const contractAddress = "0x645A0c9957e35213D17f30f8cdE8230C0C9A029A";
+// const contractAddress = "0x645A0c9957e35213D17f30f8cdE8230C0C9A029A";
 
 class TokenDAppErc20 extends Component {
 
