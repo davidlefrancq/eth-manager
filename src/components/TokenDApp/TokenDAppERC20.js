@@ -226,9 +226,9 @@ class TokenDAppErc20 extends Component {
 
     erc20Handle = (event) => {
         event.preventDefault();
-        this.setContractAddress(event).then(()=>{
+        this.setContractAddress(event).then(() => {
             this.initContract();
-        }).catch((error)=>{
+        }).catch((error) => {
             this.addError(error.message);
         })
     }
@@ -236,7 +236,7 @@ class TokenDAppErc20 extends Component {
     renderForm() {
         const {balance} = this.state;
         return (
-            <div className={"container mt-3 p-4 shadow"}>
+            <div className={"container mt-3 p-4 shadow"} style={{minHeight: 400}}>
                 <h2 className={"text-start mb-4"}>
                     WCS Token
                 </h2>
@@ -312,13 +312,15 @@ class TokenDAppErc20 extends Component {
                         </div>
                     </div>
 
-                    <div className={"text-end"}>
+                    <div className={"text-end pt-2 mt-4 border-top"}>
                         <button className={"btn btn-primary"} onClick={this.sendHandle}>
                             Submit
                         </button>
                     </div>
 
-                    {this.renderErrors()}
+                    <div className={"mt-3"}>
+                        {this.renderErrors()}
+                    </div>
 
                 </div>
             </div>
@@ -328,7 +330,7 @@ class TokenDAppErc20 extends Component {
     renderTransactions() {
         if (this.state.transactions && this.state.transactions.length > 0) {
             return (
-                <div className={"transactions-animation"}>
+                <div className={"transactions-animation mt-3"}>
                     <Transactions
                         transactions={this.state.transactions}
                         chain={this.props.chain}

@@ -157,7 +157,7 @@ class EthManager extends Component {
     renderWalletDApp() {
         if (this.state.w3Connected) {
             return (
-                <div className={"mb-5"}>
+                <div className={"col-12 offset-xl-2 col-xl-4 mb-5"}>
                     <WalletDApp account={this.state.account} balanceToEth={this.balanceToEth} chain={this.state.chain}/>
                 </div>
             );
@@ -167,7 +167,7 @@ class EthManager extends Component {
     renderTokenDAppERC10() {
         if (this.state.w3Connected) {
             return (
-                <div className={"mb-5"}>
+                <div className={"col-12 col-xl-4 mb-5"}>
                     <TokenDAppErc20
                         account={this.state.account}
                         chain={this.state.chain}
@@ -181,7 +181,7 @@ class EthManager extends Component {
 
         return (
             <>
-                <header className="App-header" style={{position:"relative"}}>
+                <header className="App-header" style={{position: "relative"}}>
                     <FaEthereum size={64}/>
 
                     <p>
@@ -190,7 +190,7 @@ class EthManager extends Component {
 
                     {this.renderChainInfo()}
 
-                    <div style={{position:"absolute", top:5, right:5, fontSize:18}}>
+                    <div style={{position: "absolute", top: 5, right: 5, fontSize: 18}}>
                         {this.renderConnexionW3Button()}
                         {this.renderAccount()}
                     </div>
@@ -202,17 +202,11 @@ class EthManager extends Component {
                     <div className={"container-fluid"}>
                         <div className={"row"}>
 
-                            <div className={"col-12 offset-xl-2 col-xl-4"}>
-                                {this.renderWalletDApp()}
-                            </div>
+                            {this.renderWalletDApp()}
 
-                            <div className={"col-12 col-xl-4"}>
-                                {this.renderTokenDAppERC10()}
-                            </div>
+                            {this.renderTokenDAppERC10()}
 
-                            <div className={"col-12 col-xl-2"}>
-                                {this.renderErrors()}
-                            </div>
+                            {this.renderErrors()}
 
                         </div>
                     </div>

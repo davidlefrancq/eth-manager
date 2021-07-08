@@ -85,7 +85,7 @@ class WalletDApp extends Component {
     sendHandle = () => {
         const stateTmp = {...this.state}
         const to = stateTmp.address;
-        const value = (Number.parseFloat(stateTmp.amount) * Math.pow(10,18));
+        const value = (Number.parseFloat(stateTmp.amount) * Math.pow(10, 18));
         this.send(to, value);
 
         const state = {...this.state}
@@ -130,7 +130,7 @@ class WalletDApp extends Component {
 
     removeError = (index) => {
         const state = {...this.state}
-        state.errors.splice(index,1);
+        state.errors.splice(index, 1);
         this.setState(state);
     }
 
@@ -159,7 +159,7 @@ class WalletDApp extends Component {
     renderForm() {
         const {balance} = this.state;
         return (
-            <div className={"container mt-3 p-4 shadow"}>
+            <div className={"container mt-3 p-4 shadow"} style={{minHeight: 400}}>
                 <h2 className={"text-start mb-4"}>Wallet dApp</h2>
 
                 <div className={"container-fluid p-3"} style={{position: "relative"}}>
@@ -213,13 +213,15 @@ class WalletDApp extends Component {
                         </div>
                     </div>
 
-                    <div className={"text-start"}>
-                        <button className={"btn btn-outline-primary"} onClick={this.sendHandle}>
-                            Send
+                    <div className={"text-end pt-2 mt-4 border-top"}>
+                        <button className={"btn btn-primary"} onClick={this.sendHandle}>
+                            Submit
                         </button>
                     </div>
 
-                    {this.renderErrors()}
+                    <div className={"mt-3"}>
+                        {this.renderErrors()}
+                    </div>
 
                 </div>
             </div>
@@ -229,7 +231,7 @@ class WalletDApp extends Component {
     renderTransactions() {
         if (this.state.transactions && this.state.transactions.length > 0) {
             return (
-                <div className={"transactions-animation"}>
+                <div className={"transactions-animation mt-3"}>
                     <Transactions transactions={this.state.transactions} chain={this.props.chain}/>
                 </div>
             );
@@ -238,10 +240,10 @@ class WalletDApp extends Component {
 
     render() {
         return (
-            <div>
+            <>
                 {this.renderForm()}
                 {this.renderTransactions()}
-            </div>
+            </>
         );
     }
 }
