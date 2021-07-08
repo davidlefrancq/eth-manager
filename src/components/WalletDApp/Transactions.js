@@ -6,8 +6,8 @@ import Explorers from "../../utils/Explorers";
 
 class Transactions extends Component {
 
-    constructor(props) {
-        super(props);
+    constructor(props, context) {
+        super(props, context);
     }
 
     renderSnipper(){

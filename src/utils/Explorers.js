@@ -25,17 +25,17 @@ const Explorers = (props) => {
 
     const renderClipboardButton = () => {
         let shadowClass = "";
-        if(shadow){
+        if (shadow) {
             shadowClass = "shadow"
         }
         return (
             <button
-               className={`btn btn-link ${shadowClass} p-1 rounded-3 h-100`}
-               style={{marginLeft: 5}}
-               onClick={(event) => {
-                   event.preventDefault();
-                   copyToClipboard(account);
-               }}
+                className={`btn btn-link ${shadowClass} p-1 rounded-3 h-100`}
+                style={{marginLeft: 5}}
+                onClick={(event) => {
+                    event.preventDefault();
+                    copyToClipboard(account);
+                }}
             >
                 <BsClipboard/>
             </button>
@@ -45,7 +45,7 @@ const Explorers = (props) => {
 
     const renderExplorer = (explorer, index) => {
         let shadowClass = "";
-        if(shadow){
+        if (shadow) {
             shadowClass = "shadow"
         }
         return (
@@ -57,6 +57,7 @@ const Explorers = (props) => {
                    className={`btn btn-link ${shadowClass} p-1 rounded-3 h-100`}
                    style={{marginLeft: 5}}
                    target={"_blank"}
+                   rel={`${explorer.name}`}
                 >
                     <BsArrowUpRight size={size}/>
                 </a>
@@ -65,9 +66,10 @@ const Explorers = (props) => {
     }
 
     const renderExplorers = () => {
+
         let explorers = [];
         let shadowClass = "";
-        if(shadow){
+        if (shadow) {
             shadowClass = "shadow"
         }
 
@@ -93,6 +95,7 @@ const Explorers = (props) => {
                         className={`btn btn-link ${shadowClass} p-1 rounded-3 h-100`}
                         style={{marginLeft: 5}}
                         target={"_blank"}
+                        rel={`${testnet}`}
                     >
                         <BsArrowUpRight size={size}/>
                     </a>

@@ -41,7 +41,8 @@ class EthManager extends Component {
     web3ProcessData = async (data) => {
 
         // Id de la Blockchain
-        const chainId = await window.ethereum.request({method: 'eth_chainId'});
+        const chainId = parseInt(await window.ethereum.request({method: 'eth_chainId'}));
+
         // Lorsque la Blockchain change
         window.ethereum.on('chainChanged', () => {
             this.connectToWeb3();
