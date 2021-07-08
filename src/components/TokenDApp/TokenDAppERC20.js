@@ -235,7 +235,7 @@ class TokenDAppErc20 extends Component {
                             <div className={"col-2 text-start"}>
                                 <button className={"btn btn-outline-primary"} onClick={() => {
                                     const size = contractAddress.length;
-                                    if (this.state.contractAddress.length == size) {
+                                    if (this.state.contractAddress.length === size) {
                                         this.init();
                                     } else {
                                         this.addError("Wrong address !")
