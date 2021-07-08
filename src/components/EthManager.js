@@ -6,6 +6,7 @@ import Web3 from "web3";
 import WeiConverter from "../utils/WeiConverter";
 import AddressFormater from "../utils/AddressFormater";
 import TokenDAppErc20 from "./TokenDApp/TokenDAppERC20";
+import {BiLogInCircle, FaEthereum} from "react-icons/all";
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 
@@ -88,8 +89,8 @@ class EthManager extends Component {
     renderConnexionW3Button() {
         if (!this.state.w3Connected) {
             return (
-                <button className={"btn btn-outline-primary m-1"} onClick={this.connectToWeb3}>
-                    Connect to Web3
+                <button className={"btn btn-link m-1 p-2"} onClick={this.connectToWeb3}>
+                    <BiLogInCircle size={32}/>
                 </button>
             );
         }
@@ -98,10 +99,13 @@ class EthManager extends Component {
     renderAccount() {
         if (this.state.account) {
             return (
-                <div className={"mt-3 p-4 text-center border-start border-end border-dark "}>
-                    <h2 className={"mb-4"}>Account</h2>
+                <div className={"m-0 p-0 text-center border-start border-end border-dark "}>
                     <div className={"d-flex justify-content-center"}>
-                        <div className={"d-inline rounded p-1 shadow"}>{AddressFormater.minimizer(this.state.account)}</div>
+                        <div
+                            className={"d-inline rounded p-1 shadow"}
+                        >
+                            {AddressFormater.minimizer(this.state.account)}
+                        </div>
                         <div>
                             <Explorers account={this.state.account} chain={this.state.chain} shadow={"shadow"}/>
                         </div>
@@ -176,33 +180,44 @@ class EthManager extends Component {
     render() {
 
         return (
-            <div className={"container-fluid m-0 p-0"}>
+            <>
+                <header className="App-header" style={{position:"relative"}}>
+                    <FaEthereum size={64}/>
 
-                {this.renderChainInfo()}
+                    <p>
+                        Ether Manager
+                    </p>
 
-                <div className={"container-fluid"}>
-                    <div className={"row"}>
+                    {this.renderChainInfo()}
 
-                        <div className={"col-12 col-xl-2"}>
-                            {this.renderAccount()}
+                    <div style={{position:"absolute", top:5, right:5, fontSize:18}}>
+                        {this.renderConnexionW3Button()}
+                        {this.renderAccount()}
+                    </div>
+
+                </header>
+
+                <div className={"container-fluid m-0 p-0"}>
+
+                    <div className={"container-fluid"}>
+                        <div className={"row"}>
+
+                            <div className={"col-12 offset-xl-2 col-xl-4"}>
+                                {this.renderWalletDApp()}
+                            </div>
+
+                            <div className={"col-12 col-xl-4"}>
+                                {this.renderTokenDAppERC10()}
+                            </div>
+
+                            <div className={"col-12 col-xl-2"}>
+                                {this.renderErrors()}
+                            </div>
+
                         </div>
-
-                        <div className={"col-12 col-xl-4"}>
-                            {this.renderWalletDApp()}
-                        </div>
-
-                        <div className={"col-12 col-xl-4"}>
-                            {this.renderTokenDAppERC10()}
-                        </div>
-
-                        <div className={"col-12 col-xl-2 text-end"}>
-                            {this.renderConnexionW3Button()}
-                            {this.renderErrors()}
-                        </div>
-
                     </div>
                 </div>
-            </div>
+            </>
         );
     }
 }
