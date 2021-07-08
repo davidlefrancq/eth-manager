@@ -56,8 +56,8 @@ const Explorers = (props) => {
                 <a href={`${explorer.url}/address/${account}`}
                    className={`btn btn-link ${shadowClass} p-1 rounded-3 h-100`}
                    style={{marginLeft: 5}}
+                   rel={"noreferrer"}
                    target={"_blank"}
-                   rel={`noreferrer`}
                 >
                     <BsArrowUpRight size={size}/>
                 </a>
@@ -94,8 +94,8 @@ const Explorers = (props) => {
                         href={`https://${testnet}.etherscan.io/address/${account}`}
                         className={`btn btn-link ${shadowClass} p-1 rounded-3 h-100`}
                         style={{marginLeft: 5}}
+                        rel={"noreferrer"}
                         target={"_blank"}
-                        rel={`noreferrer`}
                     >
                         <BsArrowUpRight size={size}/>
                     </a>
