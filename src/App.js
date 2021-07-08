@@ -1,8 +1,6 @@
-import logo from './logo.svg';
 import EthManager from "./components/EthManager";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './App.css';
-import {FaEthereum} from "react-icons/all";
 
 function App() {
     return (
