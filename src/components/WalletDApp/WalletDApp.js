@@ -30,7 +30,7 @@ class WalletDApp extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.account != this.props.account) {
+        if (prevProps.account !== this.props.account) {
             this.initBalance();
         }
     }

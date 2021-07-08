@@ -140,7 +140,7 @@ class EthManager extends Component {
     }
 
     renderErrors() {
-        if (this.state.errors && this.state.errors != "") {
+        if (this.state.errors && this.state.errors !== "") {
             return (
                 <div className={"alert alert-danger"}>
                     {this.state.errors}

@@ -33,7 +33,7 @@ class TokenDAppErc20 extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if (prevProps.account != this.props.account) {
+        if (prevProps.account !== this.props.account) {
             this.init();
         }
     }
