@@ -2,6 +2,9 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Figma Prototype
+[Interface](https://www.figma.com/file/CCPlNOj9I081vUai2T2c2v/Wallet_DogeSchool?node-id=0%3A1)
+
 ## Available Scripts
 
 In the project directory, you can run:
